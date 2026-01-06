@@ -24,3 +24,5 @@
     - [x] Fix Web UI MQTT Fields <!-- id: 21 -->
     - [x] Fix PubSubClient Buffer Size <!-- id: 22 -->
     - [x] Debug MQTT Anonymous Auth <!-- id: 23 -->
+    - [x] Fix MQTT Discovery Templates (stat_tpl -> val_tpl) <!-- id: 24 -->
+    - [x] Fix 'Off' Mode Handling <!-- id: 25 -->

@@ -58,6 +58,13 @@ void callback(char *topic, byte *payload, unsigned int length) {
     preferences.begin("gaggia", false);
     preferences.putDouble("kd", Kd);
     preferences.end();
+  } else if (String(topic) == "gaggia/set/mode") {
+    if (message == "off") {
+      myPID.SetMode(MANUAL);
+      Output = 0;
+    } else if (message == "heat") {
+      myPID.SetMode(AUTOMATIC);
+    }
   }
 }
 
@@ -93,7 +100,7 @@ void sendDiscovery() {
                     "\"unique_id\": \"gaggia_kp\","
                     "\"cmd_t\": \"gaggia/set/kp\","
                     "\"stat_t\": \"gaggia/status\","
-                    "\"stat_tpl\": \"{{value_json.kp}}\","
+                    "\"val_tpl\": \"{{value_json.kp}}\","
                     "\"min\": 0,\"max\": 200,\"step\": 0.1," +
                     deviceJson + "}";
   client.publish("homeassistant/number/gaggia_kp/config", kpConfig.c_str(),
@@ -105,7 +112,7 @@ void sendDiscovery() {
                     "\"unique_id\": \"gaggia_ki\","
                     "\"cmd_t\": \"gaggia/set/ki\","
                     "\"stat_t\": \"gaggia/status\","
-                    "\"stat_tpl\": \"{{value_json.ki}}\","
+                    "\"val_tpl\": \"{{value_json.ki}}\","
                     "\"min\": 0,\"max\": 200,\"step\": 0.01," +
                     deviceJson + "}";
   client.publish("homeassistant/number/gaggia_ki/config", kiConfig.c_str(),
@@ -117,7 +124,7 @@ void sendDiscovery() {
                     "\"unique_id\": \"gaggia_kd\","
                     "\"cmd_t\": \"gaggia/set/kd\","
                     "\"stat_t\": \"gaggia/status\","
-                    "\"stat_tpl\": \"{{value_json.kd}}\","
+                    "\"val_tpl\": \"{{value_json.kd}}\","
                     "\"min\": 0,\"max\": 200,\"step\": 0.1," +
                     deviceJson + "}";
   client.publish("homeassistant/number/gaggia_kd/config", kdConfig.c_str(),
@@ -128,7 +135,7 @@ void sendDiscovery() {
                      "\"name\": \"Gaggia Output\","
                      "\"unique_id\": \"gaggia_output\","
                      "\"stat_t\": \"gaggia/status\","
-                     "\"stat_tpl\": \"{{value_json.output}}\","
+                     "\"val_tpl\": \"{{value_json.output}}\","
                      "\"unit_of_meas\": \"%\"," +
                      deviceJson + "}";
   client.publish("homeassistant/sensor/gaggia_output/config", outConfig.c_str(),
@@ -200,8 +207,8 @@ void publishStatus() {
   String json = "{";
   json += "\"temp\":" + String(currentTemperature);
   json += ",\"target\":" + String(Setpoint);
-  json += ",\"output\":" + String(Output); // Raw output (0-1000)
-  // Convert to percentage for HA if needed roughly output/10
+  // Send output as percentage (0-100) instead of raw window (0-1000)
+  json += ",\"output\":" + String(Output / 10.0);
   json += ",\"kp\":" + String(Kp);
   json += ",\"ki\":" + String(Ki);
   json += ",\"kd\":" + String(Kd);

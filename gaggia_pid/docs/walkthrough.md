@@ -79,6 +79,8 @@ To enable integration:
 - The device will automatically appear in Home Assistant as **Gaggia PID**.
 - Entities created:
     - **Climate**: `climate.gaggia_pid` (Control Target Temp).
+        - **Heat**: PID Active.
+        - **Off**: PID Inactive, Output 0 (SSR LED Off).
     - **Number**: `number.gaggia_kp`, `ki`, `kd` (Tune PID from HA).
     - **Sensor**: `sensor.gaggia_output` (Monitor PWM Output).
 
@@ -91,8 +93,8 @@ Update firmware without a USB cable:
 
 ## Verification Checklist
 - [x] Connect Hardware.
-- [x] Update WiFi in `config.h`.
+- [x] Connect to 'GaggiaPID_Setup' WiFi to configure credentials.
 - [x] Flash Firmware.
 - [ ] Verify Temperature reading is ~Room Temp (20-25°C).
 - [ ] Verify SSR LED blinks as it heats up.
-- [ ] Verify Safety Cutoff (by testing with simulated high temp if possible).
+- [ ] Verify Safety Cutoff.
