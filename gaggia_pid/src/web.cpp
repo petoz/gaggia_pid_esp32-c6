@@ -39,11 +39,20 @@ const char *index_html = R"rawliteral(
   </div>
   <div class="card">
     <form action="/update" method="GET">
+      <h3>PID Settings</h3>
       Target: <input type="number" step="0.1" name="target" id="input_target" value=""><br>
       Kp: <input type="number" step="0.1" name="kp" id="input_kp" value=""><br>
       Ki: <input type="number" step="0.1" name="ki" id="input_ki" value=""><br>
       Kd: <input type="number" step="0.1" name="kd" id="input_kd" value=""><br>
-      <input type="submit" value="Update" class="button">
+      
+      <h3>MQTT Settings</h3>
+      Server: <input type="text" name="mqtt_server" id="input_mqtt_server" placeholder="192.168.1.100"><br>
+      Port: <input type="number" name="mqtt_port" id="input_mqtt_port" value="1883"><br>
+      User: <input type="text" name="mqtt_user" id="input_mqtt_user"><br>
+      Pass: <input type="password" name="mqtt_pass" id="input_mqtt_pass"><br>
+      
+      <br>
+      <input type="submit" value="Update & Restart" class="button">
     </form>
   </div>
 <script>
@@ -88,8 +97,10 @@ void setupWeb() {
     Serial.println(WiFi.localIP());
   }
 
+  // Main Page Handler
   server.on("/", HTTP_GET, []() { server.send(200, "text/html", index_html); });
 
+  // Status Handler
   server.on("/status", HTTP_GET, []() {
     String json = "{";
     json += "\"temp\":" + String(currentTemperature);
@@ -98,10 +109,21 @@ void setupWeb() {
     json += ",\"kp\":" + String(Kp);
     json += ",\"ki\":" + String(Ki);
     json += ",\"kd\":" + String(Kd);
+
+    Preferences preferences;
+    preferences.begin("gaggia", true);
+    json +=
+        ",\"mqtt_server\":\"" + preferences.getString("mqtt_server", "") + "\"";
+    json += ",\"mqtt_port\":" + String(preferences.getInt("mqtt_port", 1883));
+    json += ",\"mqtt_user\":\"" + preferences.getString("mqtt_user", "") + "\"";
+    json += ",\"mqtt_pass\":\"" + preferences.getString("mqtt_pass", "") + "\"";
+    preferences.end();
+
     json += "}";
     server.send(200, "application/json", json);
   });
 
+  // Settings Update Handler
   server.on("/update", HTTP_GET, []() {
     Preferences preferences;
     preferences.begin("gaggia", false); // false = read/write
@@ -122,11 +144,32 @@ void setupWeb() {
       Kd = server.arg("kd").toDouble();
       preferences.putDouble("kd", Kd);
     }
+
+    // MQTT Settings
+    if (server.hasArg("mqtt_server")) {
+      preferences.putString("mqtt_server", server.arg("mqtt_server"));
+    }
+    if (server.hasArg("mqtt_port")) {
+      preferences.putInt("mqtt_port", server.arg("mqtt_port").toInt());
+    }
+    if (server.hasArg("mqtt_user")) {
+      preferences.putString("mqtt_user", server.arg("mqtt_user"));
+    }
+    if (server.hasArg("mqtt_pass")) {
+      preferences.putString("mqtt_pass", server.arg("mqtt_pass"));
+    }
+
     preferences.end();
 
     myPID.SetTunings(Kp, Ki, Kd);
     server.sendHeader("Location", "/");
     server.send(303);
+
+    // Reboot to apply MQTT settings cleanly (simplest way)
+    if (server.hasArg("mqtt_server")) {
+      delay(500);
+      ESP.restart();
+    }
   });
 
   // OTA Update Form

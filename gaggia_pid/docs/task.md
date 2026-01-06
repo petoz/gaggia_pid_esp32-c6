@@ -14,3 +14,8 @@
     - [x] Help user flash firmware <!-- id: 11 -->
     - [x] Fix PlatformIO Arduino support for ESP32-C6 <!-- id: 12 -->
     - [x] Flash firmware to device <!-- id: 13 -->
+- [x] MQTT & Home Assistant Integration <!-- id: 14 -->
+    - [x] Add MQTT Library & Config <!-- id: 15 -->
+    - [x] Web UI for MQTT Settings <!-- id: 16 -->
+    - [x] Implement MQTT Logic (Connect/Publish/Subscribe) <!-- id: 17 -->
+    - [x] Home Assistant Auto-Discovery <!-- id: 18 -->
