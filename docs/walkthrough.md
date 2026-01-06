@@ -109,4 +109,10 @@ Update firmware without a USB cable:
 - [x] Flash Firmware.
 - [ ] Verify Temperature reading is ~Room Temp (20-25°C).
 - [ ] Verify SSR LED blinks as it heats up.
-- [ ] Verify Safety Cutoff.
+- [x] Verify Safety Cutoff.
+
+### 5. Performance Verification
+Below is the temperature response graph from the first run (Setpoint 92°C).
+
+![PID Response Graph](docs/images/pid_response_graph.png)
+*Temperature vs Output Response*
