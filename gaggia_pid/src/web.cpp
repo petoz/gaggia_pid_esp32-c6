@@ -6,6 +6,7 @@
 #include <WiFiManager.h>
 
 #include <Preferences.h>
+#include <Update.h>
 
 extern float currentTemperature;
 extern double Setpoint, Input, Output;
@@ -127,6 +128,47 @@ void setupWeb() {
     server.sendHeader("Location", "/");
     server.send(303);
   });
+
+  // OTA Update Form
+  server.on("/firmware", HTTP_GET, []() {
+    String html = "<html><body><h2>OTA Update</h2>";
+    html += "<form method='POST' action='/update_fw' "
+            "enctype='multipart/form-data'>";
+    html += "<input type='file' name='update'>";
+    html += "<input type='submit' value='Update Firmware'>";
+    html += "</form></body></html>";
+    server.send(200, "text/html", html);
+  });
+
+  // OTA Update Handler
+  server.on(
+      "/update_fw", HTTP_POST,
+      []() {
+        server.send(200, "text/plain",
+                    (Update.hasError()) ? "Update Failed"
+                                        : "Update Success! Restarting...");
+        ESP.restart();
+      },
+      []() {
+        HTTPUpload &upload = server.upload();
+        if (upload.status == UPLOAD_FILE_START) {
+          Serial.printf("Update: %s\n", upload.filename.c_str());
+          if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+            Update.printError(Serial);
+          }
+        } else if (upload.status == UPLOAD_FILE_WRITE) {
+          if (Update.write(upload.buf, upload.currentSize) !=
+              upload.currentSize) {
+            Update.printError(Serial);
+          }
+        } else if (upload.status == UPLOAD_FILE_END) {
+          if (Update.end(true)) {
+            Serial.printf("Update Success: %u\n", upload.totalSize);
+          } else {
+            Update.printError(Serial);
+          }
+        }
+      });
 
   server.begin();
 }
