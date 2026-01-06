@@ -62,16 +62,32 @@ pio run -t upload
 pio device monitor
 ```
 
-## Using the Controller
+## Features & Usage
 
-1.  **Monitor**: Open the Serial Monitor `115200` baud. You should see "Gaggia PID Controller Starting..." followed by "IP Address: ...".
-2.  **Web Dashboard**: Open the IP address in your browser.
-    -   You will see current Temp, Target, and Output.
-    -   Use the form to update Target Temp, Kp, Ki, Kd on the fly.
-3.  **Tuning**:
-    -   Start with Kp=50, Ki=0, Kd=0.
-    -   If it overshoots, reduce Kp.
-    -   Increase Ki slightly (e.g., 0.1) to remove steady-state error.
+### 1. Web Dashboard
+Open the IP address displayed in the Serial Monitor (e.g., `http://192.168.1.x`) in your browser.
+- **Status**: View current Temp, Target, and PID Output.
+- **Tuning**: Update Target Temp, Kp, Ki, Kd in real-time.
+
+### 2. MQTT & Home Assistant
+To enable integration:
+1.  Go to the Web Dashboard.
+2.  Enter your **MQTT Server IP**, **Port** (default 1883), **User**, and **Password**.
+3.  Click **Update & Restart**.
+
+**Home Assistant Auto-Discovery:**
+- The device will automatically appear in Home Assistant as **Gaggia PID**.
+- Entities created:
+    - **Climate**: `climate.gaggia_pid` (Control Target Temp).
+    - **Number**: `number.gaggia_kp`, `ki`, `kd` (Tune PID from HA).
+    - **Sensor**: `sensor.gaggia_output` (Monitor PWM Output).
+
+### 3. OTA Updates (Over-The-Air)
+Update firmware without a USB cable:
+1.  In PlatformIO, run `pio run` to build `firmware.bin` (located in `.pio/build/esp32-c6-devkitc-1/`).
+2.  Go to `http://<IP_ADDRESS>/firmware`.
+3.  Select the `.bin` file and click **Update Firmware**.
+4.  The device will flash and restart automatically.
 
 ## Verification Checklist
 - [x] Connect Hardware.

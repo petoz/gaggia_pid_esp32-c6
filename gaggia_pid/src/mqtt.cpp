@@ -62,6 +62,14 @@ void callback(char *topic, byte *payload, unsigned int length) {
 }
 
 void sendDiscovery() {
+  String deviceJson = "\"device\": {"
+                      "\"ids\": [\"gaggia_pid_esp32c6\"],"
+                      "\"name\": \"Gaggia PID\","
+                      "\"mdl\": \"ESP32-C6 PID\","
+                      "\"mf\": \"Antigravity\","
+                      "\"sw\": \"1.0\""
+                      "}";
+
   // Climate Entity
   String climateConfig =
       "{"
@@ -74,10 +82,10 @@ void sendDiscovery() {
       "\"curr_temp_t\": \"gaggia/status\","
       "\"curr_temp_tpl\": \"{{value_json.temp}}\","
       "\"min_temp\": 80,\"max_temp\": 110,\"temp_step\": 0.1,"
-      "\"modes\": [\"heat\"]"
-      "}";
-  client.publish("homeassistant/climate/gaggia/config", climateConfig.c_str(),
-                 true);
+      "\"modes\": [\"heat\", \"off\"]," +
+      deviceJson + "}";
+  client.publish("homeassistant/climate/gaggia_pid/config",
+                 climateConfig.c_str(), true);
 
   // Kp Number
   String kpConfig = "{"
@@ -86,9 +94,9 @@ void sendDiscovery() {
                     "\"cmd_t\": \"gaggia/set/kp\","
                     "\"stat_t\": \"gaggia/status\","
                     "\"stat_tpl\": \"{{value_json.kp}}\","
-                    "\"min\": 0,\"max\": 200,\"step\": 0.1"
-                    "}";
-  client.publish("homeassistant/number/gaggia/kp/config", kpConfig.c_str(),
+                    "\"min\": 0,\"max\": 200,\"step\": 0.1," +
+                    deviceJson + "}";
+  client.publish("homeassistant/number/gaggia_kp/config", kpConfig.c_str(),
                  true);
 
   // Ki Number
@@ -98,9 +106,9 @@ void sendDiscovery() {
                     "\"cmd_t\": \"gaggia/set/ki\","
                     "\"stat_t\": \"gaggia/status\","
                     "\"stat_tpl\": \"{{value_json.ki}}\","
-                    "\"min\": 0,\"max\": 200,\"step\": 0.01"
-                    "}";
-  client.publish("homeassistant/number/gaggia/ki/config", kiConfig.c_str(),
+                    "\"min\": 0,\"max\": 200,\"step\": 0.01," +
+                    deviceJson + "}";
+  client.publish("homeassistant/number/gaggia_ki/config", kiConfig.c_str(),
                  true);
 
   // Kd Number
@@ -110,9 +118,9 @@ void sendDiscovery() {
                     "\"cmd_t\": \"gaggia/set/kd\","
                     "\"stat_t\": \"gaggia/status\","
                     "\"stat_tpl\": \"{{value_json.kd}}\","
-                    "\"min\": 0,\"max\": 200,\"step\": 0.1"
-                    "}";
-  client.publish("homeassistant/number/gaggia/kd/config", kdConfig.c_str(),
+                    "\"min\": 0,\"max\": 200,\"step\": 0.1," +
+                    deviceJson + "}";
+  client.publish("homeassistant/number/gaggia_kd/config", kdConfig.c_str(),
                  true);
 
   // Output Sensor
@@ -121,30 +129,44 @@ void sendDiscovery() {
                      "\"unique_id\": \"gaggia_output\","
                      "\"stat_t\": \"gaggia/status\","
                      "\"stat_tpl\": \"{{value_json.output}}\","
-                     "\"unit_of_meas\": \"%\""
-                     "}";
-  client.publish("homeassistant/sensor/gaggia/output/config", outConfig.c_str(),
+                     "\"unit_of_meas\": \"%\"," +
+                     deviceJson + "}";
+  client.publish("homeassistant/sensor/gaggia_output/config", outConfig.c_str(),
                  true);
 }
 
 void reconnect() {
-  if (mqtt_server == "")
-    return; // No config yet
+  if (mqtt_server == "") {
+    // Serial.println("MQTT: No server configured"); // Too spammy for loop?
+    return;
+  }
 
   if (!client.connected()) {
     Serial.print("Attempting MQTT connection to ");
-    Serial.println(mqtt_server);
+    Serial.print(mqtt_server);
+    Serial.print(":");
+    Serial.println(mqtt_port);
 
     String clientId = "GaggiaPID-" + String(random(0xffff), HEX);
 
-    if (client.connect(clientId.c_str(), mqtt_user.c_str(),
-                       mqtt_pass.c_str())) {
-      Serial.println("connected");
+    bool connected;
+    if (mqtt_user.length() > 0) {
+      Serial.printf("MQTT: Logging in as user '%s'\n", mqtt_user.c_str());
+      connected = client.connect(clientId.c_str(), mqtt_user.c_str(),
+                                 mqtt_pass.c_str());
+    } else {
+      Serial.println("MQTT: Logging in anonymously");
+      connected = client.connect(clientId.c_str());
+    }
+
+    if (connected) {
+      Serial.println("MQTT: Connected!");
       client.subscribe("gaggia/set/#");
       sendDiscovery();
     } else {
-      Serial.print("failed, rc=");
+      Serial.print("MQTT: Failed, rc=");
       Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
     }
   }
 }
@@ -158,9 +180,16 @@ void setupMQTT() {
   mqtt_pass = preferences.getString("mqtt_pass", "");
   preferences.end();
 
+  Serial.println("--- MQTT Config Loaded ---");
+  Serial.printf("Server: %s\n", mqtt_server.c_str());
+  Serial.printf("Port: %d\n", mqtt_port);
+  Serial.printf("User: %s\n", mqtt_user.c_str());
+  Serial.println("--------------------------");
+
   if (mqtt_server != "") {
     client.setServer(mqtt_server.c_str(), mqtt_port);
     client.setCallback(callback);
+    client.setBufferSize(1024); // Increase buffer for HA Discovery
   }
 }
 

@@ -1,4 +1,5 @@
 #include "config.h"
+#include "mqtt.h"
 #include "web.h"
 #include <Adafruit_MAX31865.h>
 #include <Arduino.h>
@@ -57,10 +58,16 @@ void setup() {
 
   // Initialize Web Interface
   setupWeb();
+
+  // Initialize MQTT
+  setupMQTT();
 }
 
 void loop() {
   unsigned long now = millis();
+
+  // MQTT Handling
+  handleMQTT();
 
   // Read Temperature
   if (now - lastTempReadTime >= TEMP_READ_INTERVAL) {
@@ -80,10 +87,7 @@ void loop() {
       // Safety Cutoff
       if (currentTemperature > MAX_TEMP_SAFETY) {
         Serial.println("SAFETY CUTOFF TRIGGERED");
-        // In a real safety cutoff, we might want to halt completely or ensure
-        // SSR is LOW explicitly For now, setting temperature high might not be
-        // enough if PID logic is not careful. We should handle safety
-        // explicitly in SSR control.
+        // Additional safety logic could go here
       }
     }
   }

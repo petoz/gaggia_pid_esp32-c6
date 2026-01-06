@@ -65,11 +65,23 @@ setInterval(function ( ) {
       document.getElementById("target").innerHTML = json.target.toFixed(2);
       document.getElementById("output").innerHTML = json.output.toFixed(0);
       
-      // Update inputs only if not focused to avoid overwriting user while typing
+      // Update inputs only if not focused
+      // PID
       if (document.activeElement.id !== "input_target" && document.getElementById("input_target").value == "") document.getElementById("input_target").value = json.target;
       if (document.activeElement.id !== "input_kp" && document.getElementById("input_kp").value == "") document.getElementById("input_kp").value = json.kp;
       if (document.activeElement.id !== "input_ki" && document.getElementById("input_ki").value == "") document.getElementById("input_ki").value = json.ki;
       if (document.activeElement.id !== "input_kd" && document.getElementById("input_kd").value == "") document.getElementById("input_kd").value = json.kd;
+      
+      // MQTT (only populate if empty to avoid jumping)
+      if (document.activeElement.id !== "input_mqtt_server" && document.getElementById("input_mqtt_server").value == "") 
+          document.getElementById("input_mqtt_server").value = json.mqtt_server || "";
+      if (document.activeElement.id !== "input_mqtt_port" && document.getElementById("input_mqtt_port").value == "1883") 
+          document.getElementById("input_mqtt_port").value = json.mqtt_port;
+      if (document.activeElement.id !== "input_mqtt_user" && document.getElementById("input_mqtt_user").value == "") 
+          document.getElementById("input_mqtt_user").value = json.mqtt_user || "";
+      // Pass is usually not sent back for security, or we can send it. In status handler we sent it, so we can populate it.
+      if (document.activeElement.id !== "input_mqtt_pass" && document.getElementById("input_mqtt_pass").value == "") 
+          document.getElementById("input_mqtt_pass").value = json.mqtt_pass || "";
     }
   };
   xhttp.open("GET", "/status", true);

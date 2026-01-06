@@ -19,3 +19,8 @@
     - [x] Web UI for MQTT Settings <!-- id: 16 -->
     - [x] Implement MQTT Logic (Connect/Publish/Subscribe) <!-- id: 17 -->
     - [x] Home Assistant Auto-Discovery <!-- id: 18 -->
+- [x] Debugging & Fixes <!-- id: 19 -->
+    - [x] Fix Serial Output (USB-CDC) <!-- id: 20 -->
+    - [x] Fix Web UI MQTT Fields <!-- id: 21 -->
+    - [x] Fix PubSubClient Buffer Size <!-- id: 22 -->
+    - [x] Debug MQTT Anonymous Auth <!-- id: 23 -->
