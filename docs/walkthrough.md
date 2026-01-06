@@ -21,6 +21,9 @@ Wire your ESP32-C6 as follows:
 | SCK | GPIO 19 | SPI Clock |
 | **SSR** | GPIO 20 | SSR Control + |
 
+![Hardware Wiring Setup](docs/images/wiring_setup.jpg)
+*Wiring Diagram Implementation*
+
 ### 2. Sensor Wiring (3-Wire PT100)
 Based on your module photo (Black/Purple board), follow these modification steps:
 
@@ -68,6 +71,9 @@ pio device monitor
 Open the IP address displayed in the Serial Monitor (e.g., `http://192.168.1.x`) in your browser.
 - **Status**: View current Temp, Target, and PID Output.
 - **Tuning**: Update Target Temp, Kp, Ki, Kd in real-time.
+
+![Web Interface Mobile View](docs/images/web_ui_mobile.png)
+*Mobile Web Interface*
 
 ### 2. MQTT & Home Assistant
 To enable integration:

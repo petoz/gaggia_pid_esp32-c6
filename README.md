@@ -34,6 +34,9 @@ A fully featured PID controller firmware for the Gaggia Classic Espresso machine
 | **GPIO 18** | SPI MISO | MAX31865 |
 | **GPIO 19** | SPI SCK | MAX31865 |
 
+![Hardware Wiring Setup](docs/images/wiring_setup.jpg)
+*Wiring Diagram Implementation*
+
 ## Installation
 
 ### 1. Build & Flash
@@ -68,6 +71,9 @@ This project is built with **PlatformIO**.
 Access `http://<DEVICE_IP>/` to:
 - Monitor current temperature and heating status.
 - Adjust PID parameters (Kp, Ki, Kd) and Target Temperature.
+
+![Web Interface Mobile View](docs/images/web_ui_mobile.png)
+*Mobile Web Interface*
 
 ### Home Assistant
 The device exposes the following entities:
