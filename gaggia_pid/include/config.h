@@ -4,10 +4,10 @@
 #define PIN_SSR 4
 
 // SPI Pins for MAX31865
-#define PIN_SPI_CS 18
-#define PIN_SPI_MOSI 19
-#define PIN_SPI_MISO 20
-#define PIN_SPI_SCK 21
+#define PIN_SPI_CS 14
+#define PIN_SPI_MOSI 15
+#define PIN_SPI_MISO 18
+#define PIN_SPI_SCK 19
 
 // PID Constants (Defaults)
 #define PID_KP 50.0

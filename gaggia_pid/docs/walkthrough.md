@@ -15,10 +15,10 @@ Wire your ESP32-C6 as follows:
 | Device | ESP32-C6 Pin | Function |
 | :--- | :--- | :--- |
 | **MAX31865** | | |
-| CS | GPIO 18 | SPI Chip Select |
-| MOSI | GPIO 19 | SPI MOSI |
-| MISO | GPIO 20 | SPI MISO |
-| SCK | GPIO 21 | SPI Clock |
+| CS | GPIO 14 | SPI Chip Select |
+| MOSI | GPIO 15 | SPI MOSI |
+| MISO | GPIO 18 | SPI MISO |
+| SCK | GPIO 19 | SPI Clock |
 | **SSR** | GPIO 4 | SSR Control + |
 
 ### 2. Sensor Wiring (3-Wire PT100)
