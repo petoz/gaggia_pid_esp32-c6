@@ -1,16 +1,16 @@
 #include "config.h"
 #include <Arduino.h>
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
 #include <PID_v1.h>
+#include <WebServer.h>
 #include <WiFi.h>
+#include <WiFiManager.h>
 
 extern float currentTemperature;
 extern double Setpoint, Input, Output;
 extern double Kp, Ki, Kd;
 extern PID myPID;
 
-AsyncWebServer server(80);
+WebServer server(80);
 
 const char *index_html = R"rawliteral(
 <!DOCTYPE HTML><html>
@@ -32,10 +32,10 @@ const char *index_html = R"rawliteral(
   </div>
   <div class="card">
     <form action="/update" method="GET">
-      Target: <input type="number" step="0.1" name="target" value=""><br>
-      Kp: <input type="number" step="0.1" name="kp" value=""><br>
-      Ki: <input type="number" step="0.1" name="ki" value=""><br>
-      Kd: <input type="number" step="0.1" name="kd" value=""><br>
+      Target: <input type="number" step="0.1" name="target" id="input_target" value=""><br>
+      Kp: <input type="number" step="0.1" name="kp" id="input_kp" value=""><br>
+      Ki: <input type="number" step="0.1" name="ki" id="input_ki" value=""><br>
+      Kd: <input type="number" step="0.1" name="kd" id="input_kd" value=""><br>
       <input type="submit" value="Update" class="button">
     </form>
   </div>
@@ -48,6 +48,12 @@ setInterval(function ( ) {
       document.getElementById("temp").innerHTML = json.temp.toFixed(2);
       document.getElementById("target").innerHTML = json.target.toFixed(2);
       document.getElementById("output").innerHTML = json.output.toFixed(0);
+      
+      // Update inputs only if not focused to avoid overwriting user while typing
+      if (document.activeElement.id !== "input_target" && document.getElementById("input_target").value == "") document.getElementById("input_target").value = json.target;
+      if (document.activeElement.id !== "input_kp" && document.getElementById("input_kp").value == "") document.getElementById("input_kp").value = json.kp;
+      if (document.activeElement.id !== "input_ki" && document.getElementById("input_ki").value == "") document.getElementById("input_ki").value = json.ki;
+      if (document.activeElement.id !== "input_kd" && document.getElementById("input_kd").value == "") document.getElementById("input_kd").value = json.kd;
     }
   };
   xhttp.open("GET", "/status", true);
@@ -59,25 +65,25 @@ setInterval(function ( ) {
 
 void setupWeb() {
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  Serial.print("Connecting to WiFi");
-  int tryCount = 0;
-  while (WiFi.status() != WL_CONNECTED && tryCount < 20) {
-    delay(500);
-    Serial.print(".");
-    tryCount++;
-  }
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println(WiFi.localIP());
+
+  // WiFiManager
+  WiFiManager wm;
+
+  // wm.resetSettings(); // Unlock to reset if needed
+
+  bool res;
+  res = wm.autoConnect("GaggiaPID_Setup");
+
+  if (!res) {
+    Serial.println("Failed to connect");
   } else {
-    Serial.println("WiFi Connection Failed!");
+    Serial.println("connected...yeey :)");
+    Serial.println(WiFi.localIP());
   }
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/html", index_html);
-  });
+  server.on("/", HTTP_GET, []() { server.send(200, "text/html", index_html); });
 
-  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/status", HTTP_GET, []() {
     String json = "{";
     json += "\"temp\":" + String(currentTemperature);
     json += ",\"target\":" + String(Setpoint);
@@ -86,25 +92,30 @@ void setupWeb() {
     json += ",\"ki\":" + String(Ki);
     json += ",\"kd\":" + String(Kd);
     json += "}";
-    request->send(200, "application/json", json);
+    server.send(200, "application/json", json);
   });
 
-  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (request->hasParam("target")) {
-      Setpoint = request->getParam("target")->value().toDouble();
+  server.on("/update", HTTP_GET, []() {
+    if (server.hasArg("target")) {
+      Setpoint = server.arg("target").toDouble();
     }
-    if (request->hasParam("kp")) {
-      Kp = request->getParam("kp")->value().toDouble();
+    if (server.hasArg("kp")) {
+      Kp = server.arg("kp").toDouble();
     }
-    if (request->hasParam("ki")) {
-      Ki = request->getParam("ki")->value().toDouble();
+    if (server.hasArg("ki")) {
+      Ki = server.arg("ki").toDouble();
     }
-    if (request->hasParam("kd")) {
-      Kd = request->getParam("kd")->value().toDouble();
+    if (server.hasArg("kd")) {
+      Kd = server.arg("kd").toDouble();
     }
     myPID.SetTunings(Kp, Ki, Kd);
-    request->redirect("/");
+    server.sendHeader("Location", "/");
+    server.send(303);
   });
 
   server.begin();
 }
+
+// Function to handle client requests in the loop (standard WebServer needs
+// this)
+void handleWebLoop() { server.handleClient(); }

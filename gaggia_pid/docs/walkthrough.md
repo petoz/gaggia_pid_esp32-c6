@@ -41,14 +41,15 @@ Based on your module photo (Black/Purple board), follow these modification steps
 
 *Ensure you have a thermal fuse in hardware for safety!*
 
-### 3. Configuration
-Open `gaggia_pid/include/config.h` and update your WiFi credentials:
-```cpp
-#define WIFI_SSID       "YOUR_SSID"
-#define WIFI_PASS       "YOUR_PASSWORD"
-```
+### 3. Configuration & WiFi
+This firmware uses **WiFiManager**.
 
-### 3. Build and Flash
+1.  **First Boot**: When you turn on the Gaggia, the ESP32 will create a WiFi Hotspot named **GaggiaPID_Setup**.
+2.  **Connect**: Connect to this hotspot with your phone or laptop.
+3.  **Configure**: A portal should open automatically (or go to `192.168.4.1`). Select your home WiFi and enter the password.
+4.  **Save**: The ESP32 will save the credentials and restart, connecting to your home WiFi automatically from now on.
+
+### 4. Build and Flash
 Use PlatformIO to build and upload.
 > [!NOTE]
 > We use the `pioarduino` platform fork to support ESP32-C6 properly with Arduino Core 3.0.

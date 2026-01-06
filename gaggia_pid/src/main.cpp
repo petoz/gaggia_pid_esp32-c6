@@ -98,5 +98,6 @@ void loop() {
       digitalWrite(PIN_SSR, LOW);
   }
 
-  // TODO: Handle Web/WiFi
+  // Handle Web Server Requests
+  handleWebLoop();
 }
