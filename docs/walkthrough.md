@@ -84,6 +84,12 @@ To enable integration:
     - **Number**: `number.gaggia_kp`, `ki`, `kd` (Tune PID from HA).
     - **Sensor**: `sensor.gaggia_output` (Monitor PWM Output).
 
+![Gaggia PID Climate Entity](docs/images/ha_climate.jpg)
+*Climate Entity Control*
+
+![Gaggia PID Device Info](docs/images/ha_device.jpg)
+*Device Info & Tuning Controls*
+
 ### 3. OTA Updates (Over-The-Air)
 Update firmware without a USB cable:
 1.  In PlatformIO, run `pio run` to build `firmware.bin` (located in `.pio/build/esp32-c6-devkitc-1/`).

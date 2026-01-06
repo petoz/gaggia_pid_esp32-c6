@@ -76,6 +76,12 @@ The device exposes the following entities:
 - **Number**: Tune Kp, Ki, Kd dynamically.
 - **Sensor**: Monitor PID Output %.
 
+![Gaggia PID Climate Entity](docs/images/ha_climate.jpg)
+*Climate Entity Control*
+
+![Gaggia PID Device Info](docs/images/ha_device.jpg)
+*Device Info & Tuning Controls*
+
 ## OTA Updates
 Navigate to `http://<DEVICE_IP>/firmware` to upload a compiled `.bin` file (`.pio/build/<board>/firmware.bin`) for wireless updates.
 
