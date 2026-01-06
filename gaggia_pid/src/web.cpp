@@ -5,12 +5,18 @@
 #include <WiFi.h>
 #include <WiFiManager.h>
 
+#include <Preferences.h>
+
 extern float currentTemperature;
 extern double Setpoint, Input, Output;
 extern double Kp, Ki, Kd;
 extern PID myPID;
 
 WebServer server(80);
+
+// ... (index_html skip) ...
+
+// ... (setupWeb start skip) ...
 
 const char *index_html = R"rawliteral(
 <!DOCTYPE HTML><html>
@@ -96,18 +102,27 @@ void setupWeb() {
   });
 
   server.on("/update", HTTP_GET, []() {
+    Preferences preferences;
+    preferences.begin("gaggia", false); // false = read/write
+
     if (server.hasArg("target")) {
       Setpoint = server.arg("target").toDouble();
+      preferences.putDouble("target", Setpoint);
     }
     if (server.hasArg("kp")) {
       Kp = server.arg("kp").toDouble();
+      preferences.putDouble("kp", Kp);
     }
     if (server.hasArg("ki")) {
       Ki = server.arg("ki").toDouble();
+      preferences.putDouble("ki", Ki);
     }
     if (server.hasArg("kd")) {
       Kd = server.arg("kd").toDouble();
+      preferences.putDouble("kd", Kd);
     }
+    preferences.end();
+
     myPID.SetTunings(Kp, Ki, Kd);
     server.sendHeader("Location", "/");
     server.send(303);

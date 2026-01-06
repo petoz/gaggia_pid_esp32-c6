@@ -1,7 +1,7 @@
 #pragma once
 
 // Pin Definitions
-#define PIN_SSR 4
+#define PIN_SSR 20
 
 // SPI Pins for MAX31865
 #define PIN_SPI_CS 14
@@ -16,7 +16,3 @@
 
 // Safety
 #define MAX_TEMP_SAFETY 145.0
-
-// WiFi Credentials
-#define WIFI_SSID "REDACTED"
-#define WIFI_PASS "REDACTED"

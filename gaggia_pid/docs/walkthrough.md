@@ -19,7 +19,7 @@ Wire your ESP32-C6 as follows:
 | MOSI | GPIO 15 | SPI MOSI |
 | MISO | GPIO 18 | SPI MISO |
 | SCK | GPIO 19 | SPI Clock |
-| **SSR** | GPIO 4 | SSR Control + |
+| **SSR** | GPIO 20 | SSR Control + |
 
 ### 2. Sensor Wiring (3-Wire PT100)
 Based on your module photo (Black/Purple board), follow these modification steps:

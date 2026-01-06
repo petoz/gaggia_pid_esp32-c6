@@ -3,6 +3,7 @@
 #include <Adafruit_MAX31865.h>
 #include <Arduino.h>
 #include <PID_v1.h>
+#include <Preferences.h>
 
 // Initialize MAX31865 with software SPI
 Adafruit_MAX31865 max31865 =
@@ -36,10 +37,22 @@ void setup() {
   Serial.println("Initializing MAX31865...");
   max31865.begin(MAX31865_3WIRE);
 
+  // Initialize Preferences (NVS)
+  Preferences preferences;
+  preferences.begin("gaggia", true); // true = read-only
+  Setpoint = preferences.getDouble("target", 93.0);
+  Kp = preferences.getDouble("kp", PID_KP);
+  Ki = preferences.getDouble("ki", PID_KI);
+  Kd = preferences.getDouble("kd", PID_KD);
+  preferences.end();
+
+  Serial.printf("Loaded Settings: Target=%.1f, Kp=%.1f, Ki=%.1f, Kd=%.1f\n",
+                Setpoint, Kp, Ki, Kd);
+
   // Initialize PID
-  Setpoint = 93.0; // Default target temp (Celsius) for Espresso
   windowStartTime = millis();
   myPID.SetOutputLimits(0, WindowSize);
+  myPID.SetTunings(Kp, Ki, Kd);
   myPID.SetMode(AUTOMATIC);
 
   // Initialize Web Interface
