@@ -27,7 +27,9 @@ const char *index_html = R"rawliteral(
   <style>
     body { font-family: Arial; text-align: center; margin:0px auto; padding-top: 30px; }
     .card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); padding-top:10px; padding-bottom:20px; }
-    .button { background-color: #008CBA; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; }
+    .button { background-color: #008CBA; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; cursor: pointer; margin: 4px 2px; }
+    .button-off { background-color: #f44336; } 
+    .button-on { background-color: #4CAF50; }
   </style>
 </head>
 <body>
@@ -36,6 +38,9 @@ const char *index_html = R"rawliteral(
     <h3>Temperature: <span id="temp">--</span> &deg;C</h3>
     <h3>Target: <span id="target">--</span> &deg;C</h3>
     <h3>Output: <span id="output">--</span></h3>
+    <h3>Power: <span id="mode_status">--</span></h3>
+    <button onclick="setMode('heat')" class="button button-on">ON</button>
+    <button onclick="setMode('off')" class="button button-off">OFF</button>
   </div>
   <div class="card">
     <form action="/update" method="GET">
@@ -65,6 +70,15 @@ setInterval(function ( ) {
       document.getElementById("target").innerHTML = json.target.toFixed(2);
       document.getElementById("output").innerHTML = json.output.toFixed(0);
       
+      var mode = json.mode;
+      if(mode == "auto" || mode == "heat") {
+        document.getElementById("mode_status").innerHTML = "ON";
+        document.getElementById("mode_status").style.color = "green";
+      } else {
+        document.getElementById("mode_status").innerHTML = "OFF";
+        document.getElementById("mode_status").style.color = "red";
+      }
+      
       // Update inputs only if not focused
       // PID
       if (document.activeElement.id !== "input_target" && document.getElementById("input_target").value == "") document.getElementById("input_target").value = json.target;
@@ -87,6 +101,12 @@ setInterval(function ( ) {
   xhttp.open("GET", "/status", true);
   xhttp.send();
 }, 2000 ) ;
+
+function setMode(mode) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/update?mode=" + mode, true);
+  xhttp.send();
+}
 </script>
 </body>
 </html>)rawliteral";
@@ -122,6 +142,12 @@ void setupWeb() {
     json += ",\"ki\":" + String(Ki);
     json += ",\"kd\":" + String(Kd);
 
+    if (myPID.GetMode() == AUTOMATIC) {
+      json += ",\"mode\":\"heat\"";
+    } else {
+      json += ",\"mode\":\"off\"";
+    }
+
     Preferences preferences;
     preferences.begin("gaggia", true);
     json +=
@@ -155,6 +181,16 @@ void setupWeb() {
     if (server.hasArg("kd")) {
       Kd = server.arg("kd").toDouble();
       preferences.putDouble("kd", Kd);
+    }
+
+    if (server.hasArg("mode")) {
+      String mode = server.arg("mode");
+      if (mode == "off") {
+        myPID.SetMode(MANUAL);
+        Output = 0;
+      } else if (mode == "heat" || mode == "auto") {
+        myPID.SetMode(AUTOMATIC);
+      }
     }
 
     // MQTT Settings
