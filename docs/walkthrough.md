@@ -21,7 +21,7 @@ Wire your ESP32-C6 as follows:
 | SCK | GPIO 19 | SPI Clock |
 | **SSR** | GPIO 20 | SSR Control + |
 
-![Hardware Wiring Setup](../docs/images/wiring_setup.jpg)
+![Hardware Wiring Setup](images/wiring_setup.jpg)
 *Wiring Diagram Implementation*
 
 ### 2. Sensor Wiring (3-Wire PT100)
@@ -72,7 +72,7 @@ Open the IP address displayed in the Serial Monitor (e.g., `http://192.168.1.x`)
 - **Status**: View current Temp, Target, and PID Output.
 - **Tuning**: Update Target Temp, Kp, Ki, Kd in real-time.
 
-![Web Interface Mobile View](../docs/images/web_ui_mobile.png)
+![Web Interface Mobile View](images/web_ui_mobile.png)
 *Mobile Web Interface*
 
 ### 2. MQTT & Home Assistant
@@ -90,10 +90,10 @@ To enable integration:
     - **Number**: `number.gaggia_kp`, `ki`, `kd` (Tune PID from HA).
     - **Sensor**: `sensor.gaggia_output` (Monitor PWM Output).
 
-![Gaggia PID Climate Entity](../docs/images/ha_climate.jpg)
+![Gaggia PID Climate Entity](images/ha_climate.jpg)
 *Climate Entity Control*
 
-![Gaggia PID Device Info](../docs/images/ha_device.jpg)
+![Gaggia PID Device Info](images/ha_device.jpg)
 *Device Info & Tuning Controls*
 
 ### 3. OTA Updates (Over-The-Air)
@@ -114,5 +114,13 @@ Update firmware without a USB cable:
 ### 5. Performance Verification
 Below is the temperature response graph from the first run (Setpoint 92°C).
 
-![PID Response Graph](../docs/images/pid_response_graph.png)
+![PID Response Graph](images/pid_response_graph.png)
 *Temperature vs Output Response*
+
+### 6. PID vs Stock Thermostat (Steam Mode)
+The graph below demonstrates the massive difference between the PID algorithm and the stock bimetal thermostat.
+- **Left/Right (Espresso Mode)**: The PID controller keeps the temperature perfectly stable at the setpoint (yellow line).
+- **Center (Steam Mode)**: When the switch is flipped to Steam, the stock bimetal thermostat takes over. The temperature fluctuates wildly between 124°C and 172°C (the "surfing" required on stock machines).
+
+![PID vs Steam Graph](images/pid_vs_steam_graph.png)
+*Stability Comparison: PID Espresso vs Bimetal Steam*

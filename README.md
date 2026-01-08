@@ -93,3 +93,8 @@ Navigate to `http://<DEVICE_IP>/firmware` to upload a compiled `.bin` file (`.pi
 
 ## License
 MIT License.
+## License
+MIT License.
+
+---
+*Built with [Antigravity](https://antigravity.google).*
