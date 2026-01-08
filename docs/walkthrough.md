@@ -124,3 +124,23 @@ The graph below demonstrates the massive difference between the PID algorithm an
 
 ![PID vs Steam Graph](images/pid_vs_steam_graph.png)
 *Stability Comparison: PID Espresso vs Bimetal Steam*
+
+### 7. Data Logging (Node-RED + InfluxDB)
+For maximum control over data structure, use **Node-RED** to process MQTT messages before sending to InfluxDB.
+
+1.  **MQTT In Node**: Subscribe to `gaggia/status`.
+2.  **Function Node**: Format the payload.
+    ```javascript
+    msg.measurement = "gaggia";
+
+    msg.payload = {
+        temp: msg.payload.temp,
+        target: msg.payload.target,
+        output: msg.payload.output,
+        kp: msg.payload.kp,
+        ki: msg.payload.ki,
+        kd: msg.payload.kd
+    };
+    return msg;
+    ```
+3.  **InfluxDB Out Node**: Configure with your server details (v1 or v2).
