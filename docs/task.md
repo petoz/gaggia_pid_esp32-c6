@@ -27,3 +27,4 @@
     - [x] Fix MQTT Discovery Templates (stat_tpl -> val_tpl) <!-- id: 24 -->
     - [x] Fix 'Off' Mode Handling <!-- id: 25 -->
     - [x] Sanitize Git History (Remove Credentials) <!-- id: 26 -->
+    - [x] Add Grafana Dashboard Template <!-- id: 27 -->

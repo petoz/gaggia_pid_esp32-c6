@@ -144,3 +144,14 @@ For maximum control over data structure, use **Node-RED** to process MQTT messag
     return msg;
     ```
 3.  **InfluxDB Out Node**: Configure with your server details (v1 or v2).
+
+### 8. Grafana Dashboard
+I have prepared a custom Grafana dashboard JSON model for you.
+
+![Grafana Dashboard Preview](images/grafana_dashboard_preview.png)
+*Professional Coffee Geek Dashboard*
+
+1.  **Download** the [grafana_dashboard.json](grafana_dashboard.json) file.
+2.  **Import** it into Grafana (Dashboards -> Import).
+3.  **Select** your InfluxDB datasource when prompted.
+4.  **Enjoy** a professional Coffee Geek view! ☕️📈
