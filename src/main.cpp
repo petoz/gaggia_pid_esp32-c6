@@ -81,13 +81,26 @@ void loop() {
       Serial.print("Fault 0x");
       Serial.println(fault, HEX);
       max31865.clearFault();
-      currentTemperature = -999.0; // Error value
+      
+      static uint8_t faultCounter = 0;
+      faultCounter++;
+      
+      // Only report error if fault persists for > 1 second (4 readings)
+      if (faultCounter > 4) {
+        currentTemperature = -999.0; // Real error
+      } else {
+        // Transient fault - keep using last valid temperature
+        Serial.println("Transient Sensor Fault - Ignoring");
+      }
     } else {
+      static uint8_t faultCounter = 0;
+      faultCounter = 0; // Reset counter on good read
       currentTemperature = temp;
+      
       // Safety Cutoff
       if (currentTemperature > MAX_TEMP_SAFETY) {
         Serial.println("SAFETY CUTOFF TRIGGERED");
-        // Additional safety logic could go here
+         // Additional safety logic could go here
       }
     }
   }

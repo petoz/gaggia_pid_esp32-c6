@@ -28,3 +28,5 @@
     - [x] Fix 'Off' Mode Handling <!-- id: 25 -->
     - [x] Sanitize Git History (Remove Credentials) <!-- id: 26 -->
     - [x] Add Grafana Dashboard Template <!-- id: 27 -->
+- [ ] Bug Fixes <!-- id: 28 -->
+    - [x] Debounce Sensor Faults (Fix -999 spikes) <!-- id: 29 -->
