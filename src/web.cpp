@@ -4,7 +4,7 @@
 #include <WebServer.h>
 #include <WiFi.h>
 #include <WiFiManager.h>
-
+#include <ESPmDNS.h>
 #include <Preferences.h>
 #include <Update.h>
 
@@ -127,6 +127,10 @@ void setupWeb() {
   } else {
     Serial.println("connected...yeey :)");
     Serial.println(WiFi.localIP());
+    if (MDNS.begin("gaggia")) {
+      Serial.println("MDNS responder started");
+      MDNS.addService("http", "tcp", 80);
+    }
   }
 
   // Main Page Handler
